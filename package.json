@@ -1,0 +1,72 @@
+{
+  "name": "15-fall-in-daily-maple-be",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=24 <=26"
+  },
+  "description": "",
+  "main": "src/server.js",
+  "imports": {
+    "#generated/*": "./generated/*",
+    "#env": "./src/config/env.js",
+    "#db": "./src/config/db.js",
+    "#constants": "./src/constants/index.js",
+    "#errors": "./src/errors/index.js",
+    "#middlewares": "./src/middlewares/index.js",
+    "#services/*": "./src/services/*",
+    "#controllers/*": "./src/controllers/*"
+  },
+  "scripts": {
+    "dev": "node --watch --env-file=env/.env.development src/server.js",
+    "start": "node src/server.js",
+    "start:prod": "node --env-file=env/.env.production src/server.js",
+    "prisma:generate": "dotenv -e env/.env.development -- npx prisma generate",
+    "prisma:migrate": "dotenv -e env/.env.development -- npx prisma migrate dev",
+    "prisma:studio": "dotenv -e env/.env.development -- npx prisma studio",
+    "prepare": "husky",
+    "lint": "eslint \"src/**/*.js\"",
+    "lint:fix": "eslint \"src/**/*.js\" --fix",
+    "format": "prettier --write \"src/**/*.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/15-Maple/15-fall-in-daily-maple-be.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/15-Maple/15-fall-in-daily-maple-be/issues"
+  },
+  "homepage": "https://github.com/15-Maple/15-fall-in-daily-maple-be#readme",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.3.0",
+    "morgan": "^1.12.0",
+    "pg": "^8.23.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
+    "@eslint/js": "^10.0.1",
+    "dotenv-cli": "^11.0.0",
+    "eslint": "^10.9.1",
+    "eslint-plugin-perfectionist": "^5.11.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.4.1",
+    "prettier": "^3.9.6",
+    "prisma": "^7.10.0"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}
