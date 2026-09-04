@@ -55,7 +55,6 @@ model Habit {
 model HabitHistory {
   id         Int      @id @default(autoincrement())
   habitId    Int      @map("habit_id")
-  isChecked  Boolean  @default(false) @map("is_checked")
   recordDate DateTime @map("record_date") @db.Date // 시간 없이 '날짜(Date)'만 저장!
 
   createdAt DateTime @default(now()) @map("created_at")

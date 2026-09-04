@@ -21,6 +21,6 @@ export const getTodayHabits = async (logId) => {
   return habits.map((habit) => ({
     id: habit.id,
     name: habit.name,
-    isChecked: habit.habitHistories[0]?.isChecked ?? false,
+    //isChecked: habit.habitHistories[0]?.isChecked ?? false,  사용하지않음.
   }));
 };
