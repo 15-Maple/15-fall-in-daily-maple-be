@@ -22,5 +22,6 @@ export const getTodayHabits = async (logId) => {
     id: habit.id,
     name: habit.name,
     //isChecked: habit.habitHistories[0]?.isChecked ?? false,  사용하지않음.
+    isChecked: habit.habitHistories.length > 0,
   }));
 };
