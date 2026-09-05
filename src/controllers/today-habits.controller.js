@@ -20,3 +20,29 @@ export const getTodayHabits = async (req, res) => {
     data: { items },
   });
 };
+
+export const createHabitHistory = async (req, res) => {
+  const habitId = Number(req.params.habitId);
+
+  // 에러는 Express 5가 캐치해서 에러 미들웨어로 던져주기 때문에 특별한 처리가 없다면 try catch를 사용하지 않아도 됨
+  await habitService.createHabitHistory(habitId);
+
+  // 응답 예시입니다.
+  res.status(200).json({
+    success: true,
+    message: "오늘의 습관목록 토글 생성",
+  });
+};
+
+export const deleteHabitHistory = async (req, res) => {
+  const habitId = Number(req.params.habitId);
+
+  // 에러는 Express 5가 캐치해서 에러 미들웨어로 던져주기 때문에 특별한 처리가 없다면 try catch를 사용하지 않아도 됨
+  await habitService.deleteHabitHistory(habitId);
+
+  // 응답 예시입니다.
+  res.status(200).json({
+    success: true,
+    message: "오늘의 습관목록 토글 삭제",
+  });
+};

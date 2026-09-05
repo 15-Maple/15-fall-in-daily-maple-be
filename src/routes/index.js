@@ -1,7 +1,7 @@
 import express from "express";
 
 import { focusRecordRoutes } from "./focus-records.routes.js";
-import { todayHabitRoutes } from "./today-habits.routes.js";
+import { todayHabitRoutes, togleHabitRoutes } from "./today-habits.routes.js";
 
 export const router = express.Router();
 
@@ -11,3 +11,4 @@ router.use("/focus-records", focusRecordRoutes);
 
 //오늘의 습관 조회
 router.use("/logs/:logId/habits", todayHabitRoutes);
+router.use("/habits/:habitId/check", togleHabitRoutes);
