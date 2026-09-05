@@ -62,7 +62,8 @@ model HabitHistory {
 
   // [관계 정의] 
   habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
-
+  // + 이 날짜의 이 습관의 기록은 오직 한개
+  @@unique([habitId, recordDate]) 
   @@map("habit_histories")
 }
 
