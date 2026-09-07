@@ -1,5 +1,6 @@
 import { prisma } from "#db";
 
+// 리액션 조회
 export const getReactions = async (logId) => {
   const reactions = await prisma.reaction.groupBy({
     by: ["reactionType"],
@@ -18,6 +19,7 @@ export const getReactions = async (logId) => {
       },
     },
   });
+
   return reactions.map((reaction) => {
     return {
       emoji: reaction.reactionType,
@@ -26,6 +28,7 @@ export const getReactions = async (logId) => {
   });
 };
 
+// 리액션 추가
 export const postReaction = async (logId, reactionType) => {
   const reaction = await prisma.reaction.create({
     data: {
@@ -33,5 +36,6 @@ export const postReaction = async (logId, reactionType) => {
       reactionType: reactionType,
     },
   });
+
   return reaction;
 };
