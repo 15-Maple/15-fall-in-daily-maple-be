@@ -1,9 +1,17 @@
 import { prisma } from "#db";
 
-//시:분:초 를 버리고 '오늘' 날짜만 만드는 함수
+//시:분:초 를 버리고 '오늘' 날짜만 만드는 함수 한국시간 기준으로
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
 const getToday = () => {
-  const now = new Date();
-  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  const kstNow = new Date(new Date().getTime() + KST_OFFSET_MS);
+  return new Date(
+    Date.UTC(
+      kstNow.getUTCFullYear(),
+      kstNow.getUTCMonth(),
+      kstNow.getUTCDate(),
+    ),
+  );
 };
 
 // 데이터 처리와 로직만 담당함 (req, res를 알 수 없음)
