@@ -1,4 +1,4 @@
-import { getPoint } from "#service/point.service.js";
+import { getPoint } from "#services/point.service.js";
 
 //현재포인트조회
 export const getPointCtr = async (req, res) => {

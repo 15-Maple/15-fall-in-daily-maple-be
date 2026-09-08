@@ -8,7 +8,7 @@ export const getPoint = async (logId) => {
     },
 
     select: {
-      point: true,
+      points: true,
     },
   });
   return log;
