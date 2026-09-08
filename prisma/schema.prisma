@@ -16,13 +16,13 @@ enum FocusStatus {
 
 // --- 모델 정의 ---
 model Log {
-  id          Int    @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
   nickname    String
   password    String
-  description String
+  description String?
   background  String
-  points      Int    @default(0)
+  points      Int     @default(0)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
