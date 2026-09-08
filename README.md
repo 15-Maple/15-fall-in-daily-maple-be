@@ -99,3 +99,4 @@ npm run dev
 
 - [🔄 Git & PR 워크플로우 가이드](./docs/git-workflow.md)
 - [📝 커밋 메시지 규칙 및 컨벤션](./docs/commit-rules.md)
+- [🛡️ Zod 유효성 검증 미들웨어 사용 가이드](./docs/validation-guide.md)
