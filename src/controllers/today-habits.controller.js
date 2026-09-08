@@ -3,6 +3,7 @@ import * as habitService from "#services/today-habits.service.js";
 
 export const getTodayHabits = async (req, res) => {
   const logId = Number(req.params.logId);
+  const { page, limit } = res.locals.validated.query;
 
   console.log(`logId= ${logId}`);
 
@@ -11,13 +12,17 @@ export const getTodayHabits = async (req, res) => {
   }
 
   // 에러는 Express 5가 캐치해서 에러 미들웨어로 던져주기 때문에 특별한 처리가 없다면 try catch를 사용하지 않아도 됨
-  const items = await habitService.getTodayHabits(logId);
+  const { items, hasNextPage } = await habitService.getTodayHabits(
+    logId,
+    page,
+    limit,
+  );
 
   // 응답 예시입니다.
   res.status(200).json({
     success: true,
     message: "오늘의 습관목록 조회 성공",
-    data: { items },
+    data: { items, pagination: { hasNextPage } },
   });
 };
 

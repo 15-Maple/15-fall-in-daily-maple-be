@@ -14,22 +14,30 @@ const getToday = () => {
   );
 };
 
-// 데이터 처리와 로직만 담당함 (req, res를 알 수 없음)
-export const getTodayHabits = async (logId) => {
+export const getTodayHabits = async (logId, page, limit) => {
+  const skip = (page - 1) * limit;
+  //다음 페이지 여부확인을 위한 7번쨰 습관 조회
+  const take = limit + 1;
   const habits = await prisma.habit.findMany({
     where: { logId, deletedAt: null },
     orderBy: { createdAt: "desc" },
+    take,
+    skip,
     include: {
       habitHistories: { where: { recordDate: getToday() } },
     },
   });
+  const hasNextPage = habits.length > limit;
+  const trimmed = habits.slice(0, limit);
 
-  return habits.map((habit) => ({
-    id: habit.id,
-    name: habit.name,
-    //isChecked: habit.habitHistories[0]?.isChecked ?? false,  사용하지않음.
-    isChecked: habit.habitHistories.length > 0,
-  }));
+  return {
+    items: trimmed.map((habit) => ({
+      id: habit.id,
+      name: habit.name,
+      isChecked: habit.habitHistories.length > 0,
+    })),
+    hasNextPage,
+  };
 };
 
 //습관 이력 생성
