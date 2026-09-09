@@ -12,3 +12,15 @@ export const createLog = async (req, res) => {
     data: log,
   });
 };
+
+export const getLog = async (req, res) => {
+  const logId = Number(req.params.logId);
+  const log = await logService.getLog(logId);
+
+  // 응답
+  res.status(200).json({
+    success: true,
+    message: "로그 조회 성공",
+    data: log,
+  });
+};

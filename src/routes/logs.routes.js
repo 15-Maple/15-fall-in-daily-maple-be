@@ -51,7 +51,8 @@ export const createLogSchema = z
     message: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
   });
 
-// password 암호화 로직 추가해야 한다.
+// Get /api/logs/:logId (로그 하나 조회)
+logRoutes.get("/:logId", logController.getLog);
 
 // POST /api/logs (로그 생성)
 logRoutes.post("/", validate(createLogSchema), logController.createLog);
