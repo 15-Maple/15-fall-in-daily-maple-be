@@ -1,6 +1,6 @@
 import express from "express";
 
-import { focusRecordRoutes } from "./focus.routes.js";
+import { focusRoutes } from "./focus.routes.js";
 import { homeRoutes } from "./home.routes.js";
 import { logRoutes } from "./logs.routes.js";
 import { pointRoutes } from "./point.routes.js";
@@ -9,7 +9,7 @@ import { todayHabitRoutes, togleHabitRoutes } from "./today-habits.routes.js";
 
 export const router = express.Router();
 
-router.use("/focus-records", focusRecordRoutes);
+router.use("/focus", focusRoutes);
 
 // 여기에 라우터들을 추가해 주세요
 router.use("/logs", logRoutes);
