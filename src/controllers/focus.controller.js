@@ -1,4 +1,3 @@
-import { HttpException } from "#errors";
 import * as focusService from "#services/focus.service.js";
 
 export const getRecords = async (req, res) => {
@@ -59,5 +58,17 @@ export const deleteRecord = async (req, res) => {
     success: true,
     message: "삭제 성공",
     data: null,
+  });
+};
+
+export const finishFocusSession = async (req, res) => {
+  const { logId } = res.locals.validated.body;
+
+  const result = await focusService.finishAndGiveReward(logId);
+
+  res.status(200).json({
+    success: true,
+    message: "집중 완료 및 포인트 지급 성공",
+    data: result,
   });
 };
