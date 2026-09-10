@@ -30,7 +30,7 @@ export const createRecord = async (req, res) => {
 };
 
 export const getRecord = async (req, res) => {
-  const { logId } = req.params;
+  const { logId } = res.locals.validated.params;
 
   // 조회(서비스 호출)
   const record = await focusService.getFocusSession(logId);
@@ -44,7 +44,7 @@ export const getRecord = async (req, res) => {
 };
 
 export const deleteRecord = async (req, res) => {
-  const { logId } = req.params;
+  const { logId } = res.locals.validated.params;
 
   // 삭제(서비스 호출)
   const record = await focusService.getFocusSession(logId);

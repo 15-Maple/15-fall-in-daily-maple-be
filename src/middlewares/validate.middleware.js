@@ -30,7 +30,8 @@ export const validate =
 
     // 검증 성공
     // Zod 검증 및 변환이 완료된 데이터를 저장합니다.
-    // 컨트롤러에서는 req.body 대신 res.locals.validated.body를 사용합니다.
+    // 컨트롤러에서는 원본 req 데이터 대신
+    // res.locals.validated[target]을 사용합니다.
     res.locals.validated = res.locals.validated || {};
     res.locals.validated[target] = result.data;
     next();
