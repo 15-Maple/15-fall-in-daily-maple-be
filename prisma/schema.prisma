@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- 모델 정의 ---
+model Log {
+  id          Int     @id @default(autoincrement())
+  name        String
+  nickname    String
+  password    String
+  description String?
+  background  String
+  points      Int     @default(0)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // [관계 정의] 1:N 관계들
+  habits         Habit[]
+  focusSession   FocusSession?
+  pointHistories PointHistory[]
+  reactions      Reaction[]
+
+  @@map("logs") // 실제 데이터베이스의 테이블 이름
+}
+
+model Habit {
+  id    Int    @id @default(autoincrement())
+  logId Int    @map("log_id")
+  name  String
+
+  deletedAt DateTime? @map("deleted_at") // 삭제되지 않을 수도 있으므로 '?'(선택) 처리
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  // [관계 정의] 외래키(FK) 설정 및 ON DELETE CASCADE
+  log            Log            @relation(fields: [logId], references: [id], onDelete: Cascade)
+  habitHistories HabitHistory[]
+
+  @@map("habits")
+}
+
+model HabitHistory {
+  id         Int      @id @default(autoincrement())
+  habitId    Int      @map("habit_id")
+  recordDate DateTime @map("record_date") @db.Date // 시간 없이 '날짜(Date)'만 저장!
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // [관계 정의] 
+  habit Habit @relation(fields: [habitId], references: [id], onDelete: Cascade)
+
+  // + 이 날짜의 이 습관의 기록은 오직 한개
+  @@unique([habitId, recordDate])
+  @@map("habit_histories")
+}
+
+model FocusSession {
+  // 한 Log당 1개의 타이머 기록만 존재
+  logId         Int      @id @map("log_id")
+  targetSeconds Int      @map("target_seconds")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // [관계 정의]
+  log Log @relation(fields: [logId], references: [id], onDelete: Cascade)
+
+  @@map("focus_sessions")
+}
+
+model PointHistory {
+  id            Int    @id @default(autoincrement())
+  logId         Int    @map("log_id")
+  pointsChanged Int    @map("points_changed")
+  description   String
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // [관계 정의]
+  log Log @relation(fields: [logId], references: [id], onDelete: Cascade)
+
+  @@map("point_histories")
+}
+
+model Reaction {
+  id           Int    @id @default(autoincrement())
+  logId        Int    @map("log_id")
+  reactionType String @map("reaction_type")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // [관계 정의]
+  log Log @relation(fields: [logId], references: [id], onDelete: Cascade)
+
+  @@map("reactions")
+}
