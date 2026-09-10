@@ -53,8 +53,6 @@ const HABITS = [
 
 const REACTION_TYPES = ["😀", "❤️", "🐿️", "⭐️"];
 
-const FOCUS_STATUSES = ["IN_PROGRESS", "COMPLETED", "CANCELED"];
-
 const makeLogInput = () => {
   // 로그 이름 만들기
   const nickname = faker.person.firstName();
@@ -139,67 +137,31 @@ async function seed() {
   });
   await prisma.habitHistory.createMany({ data: habitHistoryData });
 
-  // 4 & 5. FocusRecord와 PointHistory 생성 (부모: Log)
-  const focusRecordData = [];
+  // 4. PointHistory 생성 (부모: Log)
   const pointHistoryData = [];
 
   logs.forEach((log) => {
-    // 각 로그당 0~10번의 집중 기록을 만듭니다.
-    const count = faker.number.int({ min: 0, max: 10 });
+    const completedCount = faker.number.int({ min: 0, max: 10 });
 
-    for (let i = 0; i < count; i++) {
-      const status = faker.helpers.arrayElement(FOCUS_STATUSES);
-
-      // 1800(30분), 2400(40분), 3000(50분), 3600(60분)
+    for (let i = 0; i < completedCount; i++) {
       const targetSeconds = faker.helpers.arrayElement([
         1800, 2400, 3000, 3600,
       ]);
+      const earnedPoints = 3 + Math.floor(targetSeconds / 600);
+      const endedAt = faker.date.recent({ days: 20 });
 
-      // 시작 시간(createdAt)과 종료 시간(endedAt) 처리
-      const focusCreatedAt =
-        status === "IN_PROGRESS"
-          ? faker.date.recent({ days: 1 })
-          : faker.date.recent({ days: 20 });
-      let endedAt = null;
-
-      // 진행 중(IN_PROGRESS)이 아니라면 종료 시간 생성
-      if (status === "COMPLETED") {
-        endedAt = new Date(focusCreatedAt.getTime() + targetSeconds * 1000);
-      } else if (status === "CANCELED") {
-        endedAt = faker.date.between({
-          from: focusCreatedAt,
-          to: new Date(focusCreatedAt.getTime() + targetSeconds * 1000),
-        });
-      }
-
-      focusRecordData.push({
+      pointHistoryData.push({
         logId: log.id,
-        targetSeconds,
-        status,
-        createdAt: focusCreatedAt,
-        endedAt,
+        pointsChanged: earnedPoints,
+        description: "집중 완료 보상",
+        createdAt: endedAt,
       });
-
-      // 집중에 성공(COMPLETED)한 경우 포인트 히스토리도 바로 생성
-      if (status === "COMPLETED") {
-        // 계산 로직: 기본 3점 + (10분 당 1포인트)
-        // 예: 3000초(50분) -> 3 + 5 = 8포인트
-        const earnedPoints = 3 + Math.floor(targetSeconds / 600);
-
-        pointHistoryData.push({
-          logId: log.id,
-          pointsChanged: earnedPoints,
-          description: "집중 완료 보상",
-          createdAt: endedAt, // 포인트가 들어온 시간은 집중이 끝난(endedAt) 시간과 동일하게
-        });
-      }
     }
   });
 
-  await prisma.focusRecord.createMany({ data: focusRecordData });
   await prisma.pointHistory.createMany({ data: pointHistoryData });
 
-  // 6. Reaction 생성 (부모: Log)
+  // 5. Reaction 생성 (부모: Log)
   const reactionData = logs.flatMap((log) => {
     const count = faker.number.int({ min: 0, max: 15 });
     return Array.from({ length: count }, () => ({
@@ -209,7 +171,7 @@ async function seed() {
   });
   await prisma.reaction.createMany({ data: reactionData });
 
-  // 7. 반정규화 데이터 정합성 맞추기: Log 테이블의 총 포인트 업데이트
+  // 6. 반정규화 데이터 정합성 맞추기: Log 테이블의 총 포인트 업데이트
   const pointsByLog = {};
 
   for (const history of pointHistoryData) {
@@ -234,7 +196,6 @@ async function seed() {
     logCount: logs.length,
     habitCount: habits.length,
     habitHistoryCount: habitHistoryData.length,
-    focusRecordCount: focusRecordData.length,
     pointHistoryCount: pointHistoryData.length,
     reactionCount: reactionData.length,
   };

@@ -1,6 +1,6 @@
 import express from "express";
 
-import { focusRecordRoutes } from "./focus-records.routes.js";
+import { focusRecordRoutes } from "./focus.routes.js";
 import { homeRoutes } from "./home.routes.js";
 import { logRoutes } from "./logs.routes.js";
 import { pointRoutes } from "./point.routes.js";
