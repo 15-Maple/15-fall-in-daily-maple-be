@@ -25,7 +25,7 @@
     "prisma:migrate": "dotenv -e ./env/.env.development -- npx prisma migrate dev",
     "prisma:studio": "dotenv -e ./env/.env.development -- npx prisma studio",
     "seed": "node --env-file=./env/.env.development ./scripts/seed.js --allow-reset=fall_in_daily",
-    "prepare": "husky || true",
+    "prepare": "husky",
     "lint": "eslint \"src/**/*.js\"",
     "lint:fix": "eslint \"src/**/*.js\" --fix",
     "format": "prettier --write \"src/**/*.js\""
