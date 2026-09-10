@@ -39,3 +39,16 @@ export const updateLog = async (req, res) => {
     data: updatedLog,
   });
 };
+
+export const verifyPassword = async (req, res) => {
+  const logId = Number(res.locals.validated.params.logId);
+  const { password } = res.locals.validated.body;
+
+  const result = await logService.verifyPassword(logId, password);
+
+  res.status(200).json({
+    success: true,
+    message: "비밀번호 확인 성공",
+    data: result,
+  });
+};

@@ -66,17 +66,22 @@ export const updateLog = async (logId, data) => {
   if (!currentLog) {
     throw new Error("존재하지 않는 로그입니다.");
   }
-  const hashedPassword = await hashPassword(password);
+
+  const updateData = {
+    nickname: data.nickname,
+    name: data.name,
+    description: data.description || null,
+    background: data.background,
+  };
+
+  // 비밀번호 변경값이 있을 때만 password 포함
+  if (password) {
+    updateData.password = await hashPassword(password);
+  }
 
   const updatedLog = await prisma.log.update({
     where: { id },
-    data: {
-      nickname: data.nickname,
-      name: data.name,
-      description: data.description || null,
-      background: data.background,
-      password: hashedPassword,
-    },
+    data: updateData,
   });
 
   return {
