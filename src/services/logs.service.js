@@ -52,3 +52,40 @@ export const createLog = async ({
     createdAt: savedLog.createdAt,
   };
 };
+
+// 로그 수정
+export const updateLog = async (logId, data) => {
+  const id = logId;
+  const { password } = data;
+
+  // 대상 로그 조회
+  const currentLog = await prisma.log.findUnique({
+    where: { id },
+  });
+
+  if (!currentLog) {
+    throw new Error("존재하지 않는 로그입니다.");
+  }
+  const hashedPassword = await hashPassword(password);
+
+  const updatedLog = await prisma.log.update({
+    where: { id },
+    data: {
+      nickname: data.nickname,
+      name: data.name,
+      description: data.description || null,
+      background: data.background,
+      password: hashedPassword,
+    },
+  });
+
+  return {
+    logId: updatedLog.id,
+    nickname: updatedLog.nickname,
+    name: updatedLog.name,
+    description: updatedLog.description,
+    background: updatedLog.background,
+    points: updatedLog.points,
+    updatedAt: updatedLog.updatedAt,
+  };
+};
