@@ -94,3 +94,10 @@ export const updateLog = async (logId, data) => {
     updatedAt: updatedLog.updatedAt,
   };
 };
+
+// 로그 삭제
+export const deleteLog = async (logId) => {
+  return await prisma.log.delete({
+    where: { id: Number(logId) },
+  });
+};

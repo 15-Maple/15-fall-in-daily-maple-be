@@ -40,15 +40,33 @@ export const updateLog = async (req, res) => {
   });
 };
 
-export const verifyPassword = async (req, res) => {
-  const logId = Number(res.locals.validated.params.logId);
-  const { password } = res.locals.validated.body;
+export const deleteLog = async (req, res) => {
+  const { logId } = res.locals.validated.params;
 
-  const result = await logService.verifyPassword(logId, password);
+  // 삭제(서비스 호출)
+  const log = await logService.getLog(logId);
 
+  if (log) {
+    await logService.deleteLog(logId);
+  }
+
+  // 응답
   res.status(200).json({
     success: true,
-    message: "비밀번호 확인 성공",
-    data: result,
+    message: "로그 삭제 성공",
+    data: null,
   });
 };
+
+// export const verifyPassword = async (req, res) => {
+//   const logId = Number(res.locals.validated.params.logId);
+//   const { password } = res.locals.validated.body;
+
+//   const result = await logService.verifyPassword(logId, password);
+
+//   res.status(200).json({
+//     success: true,
+//     message: "비밀번호 확인 성공",
+//     data: result,
+//   });
+// };

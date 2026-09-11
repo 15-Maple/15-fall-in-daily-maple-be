@@ -138,3 +138,10 @@ logRoutes.patch(
   validate(updateLogSchema, "body"),
   logController.updateLog,
 );
+
+// DELETE /api/logs/:logId (로그 삭제)
+logRoutes.delete(
+  "/:logId",
+  validate(logIdSchema, "params"),
+  logController.deleteLog,
+);
