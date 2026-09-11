@@ -60,3 +60,80 @@ export const deleteHabitHistory = async (habitId) => {
   });
   return deleted;
 };
+
+export const getHabitsWeekly = async (logId) => {
+  const today = getToday();
+  const dayOfWeek = today.getDay();
+  const dayOfWeekStart = dayOfWeek === 0 ? Number(6) : Number(dayOfWeek - 1);
+  const dayOfWeekEnd = Number(6) - dayOfWeekStart;
+  const weekStart = new Date(
+    Date.UTC(
+      today.getUTCFullYear(),
+      today.getUTCMonth(),
+      today.getUTCDate() - dayOfWeekStart,
+    ),
+  );
+  const weekEnd = new Date(
+    Date.UTC(
+      today.getUTCFullYear(),
+      today.getUTCMonth(),
+      today.getUTCDate() + dayOfWeekEnd,
+    ),
+  );
+
+  const weeklyHabits = await prisma.habit.findMany({
+    where: {
+      logId,
+      OR: [
+        { deletedAt: null },
+        {
+          habitHistories: {
+            some: {
+              recordDate: {
+                gte: weekStart,
+                lte: weekEnd,
+              },
+            },
+          },
+        },
+      ],
+    },
+    orderBy: { createdAt: "asc" },
+    include: {
+      habitHistories: {
+        where: {
+          recordDate: {
+            gte: weekStart,
+            lte: weekEnd,
+          },
+        },
+      },
+    },
+  });
+
+  //일주일 true/false 배열 만들기
+  const buildWeeklyRecords = (habitHistories, weekStart) => {
+    const records = Array(7).fill(false);
+
+    habitHistories.forEach((history) => {
+      const diffDays = Math.round(
+        (history.recordDate.getTime() - weekStart.getTime()) /
+          (1000 * 60 * 60 * 24),
+      );
+      records[diffDays] = true;
+    });
+
+    return records;
+  };
+
+  return {
+    weekStart,
+    weekEnd,
+    habits: weeklyHabits.map((weeklyHabit) => ({
+      habitId: weeklyHabit.id,
+      name: weeklyHabit.name,
+      isDeleted: weeklyHabit.deletedAt !== null,
+      records: buildWeeklyRecords(weeklyHabit.habitHistories, weekStart),
+    })),
+  };
+};

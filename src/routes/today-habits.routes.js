@@ -21,5 +21,8 @@ todayHabitRoutes.get(
   habitController.getTodayHabits,
 );
 
+// GET /api/{logId}/habits/weekly
+todayHabitRoutes.get("/weekly", habitController.getHabitsWeekly);
+
 togleHabitRoutes.post("/", habitController.createHabitHistory);
 togleHabitRoutes.delete("/", habitController.deleteHabitHistory);
