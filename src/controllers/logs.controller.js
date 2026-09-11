@@ -13,6 +13,18 @@ export const createLog = async (req, res) => {
   });
 };
 
+// GET (로그 전체 조회)
+export const getLogs = async (req, res) => {
+  const logs = await logService.getLogs();
+
+  res.status(200).json({
+    success: true,
+    data: {
+      items: logs,
+    },
+  });
+};
+
 // GET :id
 export const getLogById = async (req, res) => {
   const logId = Number(req.params.logId);

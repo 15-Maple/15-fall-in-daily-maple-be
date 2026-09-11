@@ -125,6 +125,9 @@ const logIdSchema = z.object({
 //   password: z.string.min(1, "비밀번호를 입력해주세요")
 // });
 
+// Get /api/logs (로그 전체 조회)
+logRoutes.get("/logs", logController.getLogs);
+
 // Get /api/logs/:logId (로그 하나 조회)
 logRoutes.get(
   "/:logId",

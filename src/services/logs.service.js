@@ -2,6 +2,13 @@ import { prisma } from "#db";
 import { hashPassword } from "#utils";
 
 // 데이터 처리와 로직만 담당함 (req, res를 알 수 없음)
+// 로그 전체 조회
+export const getLogs = async () => {
+  const logs = await prisma.log.findMany();
+
+  return logs;
+};
+
 // 현재 로그 조회
 export const getLogById = async (logId) => {
   const log = await prisma.log.findUnique({
