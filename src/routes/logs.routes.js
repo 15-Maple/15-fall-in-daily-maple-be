@@ -126,7 +126,7 @@ const logIdSchema = z.object({
 // });
 
 // Get /api/logs (로그 전체 조회)
-logRoutes.get("/logs", logController.getLogs);
+logRoutes.get("/", logController.getLogs);
 
 // Get /api/logs/:logId (로그 하나 조회)
 logRoutes.get(
