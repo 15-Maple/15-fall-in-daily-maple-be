@@ -7,7 +7,7 @@ import { validate } from "#middlewares";
 export const authRoutes = express.Router();
 
 const verifySchema = z.object({
-  logId: z
+  logId: z.coerce
     .number({ error: "로그 ID는 숫자로 입력해 주세요" })
     .int("로그 ID는 정수여야 합니다")
     .positive("로그 ID는 1 이상의 양수여야 합니다"),

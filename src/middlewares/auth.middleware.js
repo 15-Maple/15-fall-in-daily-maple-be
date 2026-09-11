@@ -6,7 +6,7 @@ export const requireLogAuth = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw new HttpException(401, "출입증(토큰)이 없습니다.");
+    throw new HttpException(401, "토큰이 없습니다.");
   }
 
   const token = authHeader.split(" ")[1];
@@ -21,6 +21,7 @@ export const requireLogAuth = (req, res, next) => {
     req.logAuth = decoded;
     next();
   } catch (err) {
-    throw new HttpException(401, "유효하지 않거나 만료된 출입증입니다.");
+    console.error("🚨 [JWT 인증 에러]:", err.message);
+    throw new HttpException(401, "유효하지 않거나 만료된 토큰입니다.");
   }
 };
