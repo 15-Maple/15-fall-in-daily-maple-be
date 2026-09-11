@@ -125,8 +125,15 @@ const logIdSchema = z.object({
 //   password: z.string.min(1, "비밀번호를 입력해주세요")
 // });
 
+// Get /api/logs (로그 전체 조회)
+logRoutes.get("/", logController.getLogs);
+
 // Get /api/logs/:logId (로그 하나 조회)
-logRoutes.get("/:logId", logController.getLog);
+logRoutes.get(
+  "/:logId",
+  validate(logIdSchema, "params"),
+  logController.getLogById,
+);
 
 // POST /api/logs (로그 생성)
 logRoutes.post("/", validate(createLogSchema), logController.createLog);
@@ -137,4 +144,11 @@ logRoutes.patch(
   validate(logIdSchema, "params"),
   validate(updateLogSchema, "body"),
   logController.updateLog,
+);
+
+// DELETE /api/logs/:logId (로그 삭제)
+logRoutes.delete(
+  "/:logId",
+  validate(logIdSchema, "params"),
+  logController.deleteLog,
 );
