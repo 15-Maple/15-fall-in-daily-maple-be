@@ -3,7 +3,7 @@ import { hashPassword } from "#utils";
 
 // 데이터 처리와 로직만 담당함 (req, res를 알 수 없음)
 // 현재 로그 조회
-export const getLog = async (logId) => {
+export const getLogById = async (logId) => {
   const log = await prisma.log.findUnique({
     where: {
       id: logId,

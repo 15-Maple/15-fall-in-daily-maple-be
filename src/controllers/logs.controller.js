@@ -14,9 +14,9 @@ export const createLog = async (req, res) => {
 };
 
 // GET :id
-export const getLog = async (req, res) => {
+export const getLogById = async (req, res) => {
   const logId = Number(req.params.logId);
-  const log = await logService.getLog(logId);
+  const log = await logService.getLogById(logId);
 
   // 응답
   res.status(200).json({
@@ -44,7 +44,7 @@ export const deleteLog = async (req, res) => {
   const { logId } = res.locals.validated.params;
 
   // 삭제(서비스 호출)
-  const log = await logService.getLog(logId);
+  const log = await logService.getLogById(logId);
 
   if (log) {
     await logService.deleteLog(logId);

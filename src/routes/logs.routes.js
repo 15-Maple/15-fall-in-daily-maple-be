@@ -126,7 +126,11 @@ const logIdSchema = z.object({
 // });
 
 // Get /api/logs/:logId (로그 하나 조회)
-logRoutes.get("/:logId", logController.getLog);
+logRoutes.get(
+  "/:logId",
+  validate(logIdSchema, "params"),
+  logController.getLogById,
+);
 
 // POST /api/logs (로그 생성)
 logRoutes.post("/", validate(createLogSchema), logController.createLog);
