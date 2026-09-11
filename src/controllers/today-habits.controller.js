@@ -5,7 +5,7 @@ export const getTodayHabits = async (req, res) => {
   const logId = Number(req.params.logId);
   const { page, limit } = res.locals.validated.query;
 
-  console.log(`logId= ${logId}`);
+  console.log(`습관 조회 logId= ${logId}`);
 
   if (!Number.isInteger(logId) || logId <= 0) {
     throw new BadRequestException("올바르지 않는 로그 아이디입니다.");
@@ -33,7 +33,7 @@ export const createHabitHistory = async (req, res) => {
   await habitService.createHabitHistory(habitId);
 
   // 응답 예시입니다.
-  res.status(200).json({
+  res.status(201).json({
     success: true,
     message: "오늘의 습관목록 토글 생성",
   });
@@ -49,5 +49,23 @@ export const deleteHabitHistory = async (req, res) => {
   res.status(200).json({
     success: true,
     message: "오늘의 습관목록 토글 삭제",
+  });
+};
+
+export const getHabitsWeekly = async (req, res) => {
+  const logId = Number(req.params.logId);
+
+  if (!Number.isInteger(logId) || logId <= 0) {
+    throw new BadRequestException("올바르지 않는 로그 아이디입니다.");
+  }
+  console.log(`주간 습관  logId= ${logId}`);
+
+  const { weekStart, weekEnd, habits } =
+    await habitService.getHabitsWeekly(logId);
+
+  res.status(200).json({
+    success: true,
+    message: "습관기록표 조회 성공",
+    data: { weekStart, weekEnd, habits },
   });
 };
