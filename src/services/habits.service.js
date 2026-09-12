@@ -1,20 +1,7 @@
 import { prisma } from "#db";
+import { getToday } from "#utils";
 
-//시:분:초 를 버리고 '오늘' 날짜만 만드는 함수 한국시간 기준으로
-const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
-
-const getToday = () => {
-  const kstNow = new Date(new Date().getTime() + KST_OFFSET_MS);
-  return new Date(
-    Date.UTC(
-      kstNow.getUTCFullYear(),
-      kstNow.getUTCMonth(),
-      kstNow.getUTCDate(),
-    ),
-  );
-};
-
-export const getTodayHabits = async (logId, page, limit) => {
+export const getHabits = async (logId, page, limit) => {
   const skip = (page - 1) * limit;
   //다음 페이지 여부확인을 위한 7번쨰 습관 조회
   const take = limit + 1;
