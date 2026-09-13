@@ -1,4 +1,5 @@
 import { prisma } from "#db";
+import { ConflictException } from "#errors";
 import { hashPassword } from "#utils";
 
 // 데이터 처리와 로직만 담당함 (req, res를 알 수 없음)
@@ -37,6 +38,18 @@ export const createLog = async ({
   background,
   password,
 }) => {
+  const duplicatedLog = await prisma.log.findFirst({
+    where: {
+      name: name.trim(),
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (duplicatedLog) {
+    throw new ConflictException("이미 사용중인 로그 이름입니다.");
+  }
   const hashedPassword = await hashPassword(password);
 
   const savedLog = await prisma.log.create({
@@ -107,4 +120,18 @@ export const deleteLog = async (logId) => {
   return await prisma.log.delete({
     where: { id: Number(logId) },
   });
+};
+
+// 로그 이름 중복 확인
+export const nameCheckService = async (logName) => {
+  const log = await prisma.log.findFirst({
+    where: {
+      name: String(logName).trim(),
+    },
+    select: {
+      id: true,
+    },
+  });
+  // 중복되는 이름이면 Boolean(log) == true
+  return Boolean(log);
 };

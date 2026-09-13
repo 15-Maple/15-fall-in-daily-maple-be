@@ -121,12 +121,23 @@ const logIdSchema = z.object({
   logId: z.coerce.number().int().positive(),
 });
 
-// const verifyPasswordSchema = z.object({
-//   password: z.string.min(1, "비밀번호를 입력해주세요")
-// });
+const nameCheckSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "로그 이름은 필수입니다.")
+    .max(20, "로그 이름 글자수 초과입니다."),
+});
 
 // Get /api/logs (로그 전체 조회)
 logRoutes.get("/", logController.getLogs);
+
+// GET /api/logs/name-check?name=이름
+logRoutes.get(
+  "/name-check",
+  validate(nameCheckSchema, "query"),
+  logController.nameCheck,
+);
 
 // Get /api/logs/:logId (로그 하나 조회)
 logRoutes.get(

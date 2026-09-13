@@ -70,15 +70,19 @@ export const deleteLog = async (req, res) => {
   });
 };
 
-// export const verifyPassword = async (req, res) => {
-//   const logId = Number(res.locals.validated.params.logId);
-//   const { password } = res.locals.validated.body;
+// 로그 이름 조회
+export const nameCheck = async (req, res) => {
+  const { name: logName } = res.locals.validated.query;
 
-//   const result = await logService.verifyPassword(logId, password);
+  // 로그 이름 (서비스 호출)
+  const isNameExist = await logService.nameCheckService(logName);
+  // 중복 되는 이름이면 service에서 true 리턴 -> isNameExist == true
 
-//   res.status(200).json({
-//     success: true,
-//     message: "비밀번호 확인 성공",
-//     data: result,
-//   });
-// };
+  res.status(200).json({
+    success: true,
+    message: isNameExist
+      ? "로그 이름 중복입니다."
+      : "사용 가능한 로그 이름입니다.",
+    data: isNameExist,
+  });
+};
