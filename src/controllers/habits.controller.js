@@ -1,7 +1,7 @@
 import * as habitService from "#services/habits.service.js";
 
 export const getHabits = async (req, res) => {
-  const { logId } = res.locals.validated.params;
+  const { logId } = req.logAuth; // 토큰에서 꺼냄 (신뢰 가능)
   const { page, limit } = res.locals.validated.query;
 
   const { items, hasNextPage } = await habitService.getHabits(
@@ -18,9 +18,10 @@ export const getHabits = async (req, res) => {
 };
 
 export const createHabitHistory = async (req, res) => {
+  const { logId } = req.logAuth;
   const { habitId } = res.locals.validated.params;
 
-  await habitService.createHabitHistory(habitId);
+  await habitService.createHabitHistory(habitId, logId);
 
   res.status(201).json({
     success: true,
@@ -29,9 +30,10 @@ export const createHabitHistory = async (req, res) => {
 };
 
 export const deleteHabitHistory = async (req, res) => {
+  const { logId } = req.logAuth;
   const { habitId } = res.locals.validated.params;
 
-  await habitService.deleteHabitHistory(habitId);
+  await habitService.deleteHabitHistory(habitId, logId);
 
   res.status(200).json({
     success: true,
@@ -40,7 +42,7 @@ export const deleteHabitHistory = async (req, res) => {
 };
 
 export const getHabitsWeekly = async (req, res) => {
-  const { logId } = res.locals.validated.params;
+  const { logId } = req.logAuth;
 
   const { weekStart, weekEnd, habits } =
     await habitService.getHabitsWeekly(logId);

@@ -18,7 +18,7 @@ router.use("/home", homeRoutes);
 router.use("/auth", authRoutes);
 
 //오늘의 습관 조회
-router.use("/logs/:logId/habits", habitRoutes);
+router.use("/habits", habitRoutes);
 router.use("/habits/:habitId/check", togleHabitRoutes);
 
 //리액션 조회&추가

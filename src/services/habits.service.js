@@ -1,5 +1,18 @@
 import { prisma } from "#db";
+import { ForbiddenException, NotFoundException } from "#errors";
 import { getToday } from "#utils";
+
+const assertHabitOwnership = async (habitId, logId) => {
+  const habit = await prisma.habit.findUnique({ where: { id: habitId } });
+
+  if (!habit) {
+    throw new NotFoundException("존재하지 않는 습관입니다.");
+  }
+
+  if (habit.logId !== logId) {
+    throw new ForbiddenException("해당 습관에 대한 권한이 없습니다.");
+  }
+};
 
 export const getHabits = async (logId, page, limit) => {
   const skip = (page - 1) * limit;
@@ -28,7 +41,9 @@ export const getHabits = async (logId, page, limit) => {
 };
 
 //습관 이력 생성
-export const createHabitHistory = async (habitId) => {
+export const createHabitHistory = async (habitId, logId) => {
+  await assertHabitOwnership(habitId, logId);
+
   const created = await prisma.habitHistory.create({
     data: { habitId, recordDate: getToday() },
   });
@@ -36,7 +51,9 @@ export const createHabitHistory = async (habitId) => {
 };
 
 //습관 이력 삭제
-export const deleteHabitHistory = async (habitId) => {
+export const deleteHabitHistory = async (habitId, logId) => {
+  await assertHabitOwnership(habitId, logId);
+
   const deleted = await prisma.habitHistory.delete({
     where: {
       habitId_recordDate: {
