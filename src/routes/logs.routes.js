@@ -2,7 +2,7 @@ import express from "express";
 import { z } from "zod";
 
 import * as logController from "#controllers/logs.controller.js";
-import { validate } from "#middlewares";
+import { requireLogAuth, validate } from "#middlewares";
 
 export const logRoutes = express.Router();
 
@@ -24,12 +24,12 @@ export const createLogSchema = z
     nickname: z
       .string()
       .trim()
-      .min(2, "닉네임은 2글자 이상 필수입니다.")
+      .min(1, "닉네임은 필수입니다.")
       .max(12, "닉네임 글자수 초과입니다."),
     name: z
       .string()
       .trim()
-      .min(2, "로그 이름은 2글자 이상 필수입니다.")
+      .min(1, "로그 이름은 필수입니다.")
       .max(20, "로그 이름 글자수 초과입니다."),
     description: z
       .string()
@@ -43,16 +43,137 @@ export const createLogSchema = z
     background: z
       .enum(ALLOWED_BACKGROUNDS, { error: "허용되지 않은 배경입니다." })
       .default("bgGreen"),
-    password: z.string().min(1, "비밀번호는 필수입니다."),
-    passwordConfirm: z.string().min(1, "비밀번호 확인은 필수입니다."),
+    password: z.string().optional(),
+    passwordConfirm: z.string().optional(),
   })
   .superRefine((data) => data.password === data.passwordConfirm, {
     path: ["passwordConfirm"],
     message: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
   });
 
+export const updateLogSchema = z
+  .object({
+    nickname: z
+      .string()
+      .trim()
+      .min(1, "닉네임은 필수입니다.")
+      .max(12, "닉네임 글자수 초과입니다."),
+
+    name: z
+      .string()
+      .trim()
+      .min(1, "로그 이름은  필수입니다.")
+      .max(20, "로그 이름 글자수 초과입니다."),
+
+    description: z
+      .string()
+      .trim()
+      .max(140, "소개 글자수 초과입니다.")
+      .nullable()
+      .optional()
+      .transform((value) =>
+        value === null || value === undefined || value === "" ? null : value,
+      ),
+    background: z
+      .enum(ALLOWED_BACKGROUNDS, { error: "허용되지 않은 배경입니다." })
+      .default("bgGreen"),
+    password: z
+      .string()
+      .min(4, "비밀번호는 4글자 이상이어야 합니다.")
+      .max(15, "비밀번호는 15글자 이하여야 합니다.")
+      .optional(),
+    passwordConfirm: z
+      .string()
+      .min(4, "비밀번호는 4글자 이상이어야 합니다.")
+      .max(15, "비밀번호는 15글자 이하여야 합니다.")
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    const password = data.password?.trim() || "";
+    const passwordConfirm = data.passwordConfirm?.trim() || "";
+
+    // 둘 다 입력 없으면 기존 비밀번호 유지
+    if (!password && !passwordConfirm) {
+      return;
+    }
+
+    // 비밀번호 확인만 입력한 경우
+    if (!password) {
+      ctx.addIssue({
+        code: "custom",
+        message: "비밀번호를 입력해주세요",
+        path: ["password"],
+      });
+    }
+
+    // 비밀번호만 입력한 경우
+    if (!passwordConfirm) {
+      ctx.addIssue({
+        code: "custom",
+        message: "비밀번호 확인을 입력해주세요",
+        path: ["passwordConfirm"],
+      });
+    }
+
+    // 모두 입력했지만 서로 다른 경우
+    if (password && passwordConfirm && password !== passwordConfirm) {
+      ctx.addIssue({
+        code: "custom",
+        message: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
+        path: ["passwordConfirm"],
+      });
+    }
+  });
+
+const logIdSchema = z.object({
+  logId: z.coerce.number().int().positive(),
+});
+
+const nameCheckSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "로그 이름은 필수입니다.")
+    .max(20, "로그 이름 글자수 초과입니다."),
+});
+
+// Get /api/logs (로그 전체 조회)
+logRoutes.get("/", logController.getLogs);
+
+// GET /api/logs/name-check?name=이름
+logRoutes.get(
+  "/name-check",
+  validate(nameCheckSchema, "query"),
+  logController.nameCheck,
+);
+
 // Get /api/logs/:logId (로그 하나 조회)
-logRoutes.get("/:logId", logController.getLog);
+logRoutes.get(
+  "/:logId",
+  validate(logIdSchema, "params"),
+  logController.getLogById,
+);
 
 // POST /api/logs (로그 생성)
 logRoutes.post("/", validate(createLogSchema), logController.createLog);
+
+// PATCH /api/logs/:logId (로그 수정)
+logRoutes.patch(
+  "/",
+  requireLogAuth,
+  // validate(logIdSchema, "params"),
+  // requireLogAuth로 logId를 가져오기 때문에 받아오지도 않고 검증하지도 않는 것으로 변경하였습니다!
+  // (토큰으로 검증함)
+  validate(updateLogSchema, "body"),
+  logController.updateLog,
+);
+
+// DELETE /api/logs/:logId (로그 삭제)
+logRoutes.delete(
+  "/",
+  requireLogAuth,
+  // validate(logIdSchema, "params"),
+  // requireLogAuth로 logId를 가져오기 때문에 받아오지도 않고 검증하지도 않는 것으로 변경하였습니다!
+  // (토큰으로 검증함)
+  logController.deleteLog,
+);

@@ -1,9 +1,17 @@
 import { prisma } from "#db";
+import { ConflictException } from "#errors";
 import { hashPassword } from "#utils";
 
 // 데이터 처리와 로직만 담당함 (req, res를 알 수 없음)
+// 로그 전체 조회
+export const getLogs = async () => {
+  const logs = await prisma.log.findMany();
+
+  return logs;
+};
+
 // 현재 로그 조회
-export const getLog = async (logId) => {
+export const getLogById = async (logId) => {
   const log = await prisma.log.findUnique({
     where: {
       id: logId,
@@ -30,6 +38,18 @@ export const createLog = async ({
   background,
   password,
 }) => {
+  const duplicatedLog = await prisma.log.findFirst({
+    where: {
+      name: name.trim(),
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (duplicatedLog) {
+    throw new ConflictException("이미 사용중인 로그 이름입니다.");
+  }
   const hashedPassword = await hashPassword(password);
 
   const savedLog = await prisma.log.create({
@@ -51,4 +71,67 @@ export const createLog = async ({
     points: savedLog.points,
     createdAt: savedLog.createdAt,
   };
+};
+
+// 로그 수정
+export const updateLog = async (logId, data) => {
+  const id = logId;
+  const { password } = data;
+
+  // 대상 로그 조회
+  const currentLog = await prisma.log.findUnique({
+    where: { id },
+  });
+
+  if (!currentLog) {
+    throw new Error("존재하지 않는 로그입니다.");
+  }
+
+  const updateData = {
+    nickname: data.nickname,
+    name: data.name,
+    description: data.description || null,
+    background: data.background,
+  };
+
+  // 비밀번호 변경값이 있을 때만 password 포함
+  if (password) {
+    updateData.password = await hashPassword(password);
+  }
+
+  const updatedLog = await prisma.log.update({
+    where: { id },
+    data: updateData,
+  });
+
+  return {
+    logId: updatedLog.id,
+    nickname: updatedLog.nickname,
+    name: updatedLog.name,
+    description: updatedLog.description,
+    background: updatedLog.background,
+    points: updatedLog.points,
+    updatedAt: updatedLog.updatedAt,
+  };
+};
+
+// 로그 삭제
+export const deleteLog = async (logId) => {
+  return await prisma.log.delete({
+    where: { id: Number(logId) },
+  });
+};
+
+// 로그 이름 중복 확인
+export const nameCheckService = async (logName) => {
+  const log = await prisma.log.findFirst({
+    where: {
+      name: String(logName).trim(),
+    },
+    select: {
+      id: true,
+    },
+  });
+  // 중복되는 이름이면 Boolean(log) == true
+  return Boolean(log);
 };

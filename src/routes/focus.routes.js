@@ -2,34 +2,30 @@ import express from "express";
 import { z } from "zod";
 
 import * as focusController from "#controllers/focus.controller.js";
-import { validate } from "#middlewares";
+import { requireLogAuth, validate } from "#middlewares";
 
-export const focusRecordRoutes = express.Router();
+export const focusRoutes = express.Router();
 
 const createSchema = z.object({
-  logId: z
-    .number({ error: "로그 ID는 숫자로 입력해 주세요" })
-    .int("로그 ID는 정수여야 합니다")
-    .positive("로그 ID는 1 이상의 양수여야 합니다"),
-
   targetSeconds: z
     .number({ error: "목표 시간(초)은 숫자로 입력해 주세요" })
     .int("목표 시간은 정수여야 합니다")
-    .min(1, "목표 시간은 최소 1초 이상이어야 합니다"),
+    .min(600, "목표 시간은 최소 10분 이상이어야 합니다."),
 });
 
-// GET /api/focus-records (집중 기록 전체 목록 조회)
-focusRecordRoutes.get("/", focusController.getRecords);
-
-// POST /api/focus-records (집중 기록 생성)
-focusRecordRoutes.post(
+// POST /api/focus (집중 세션 생성)
+focusRoutes.post(
   "/",
+  requireLogAuth,
   validate(createSchema),
   focusController.createRecord,
 );
 
-// GET /api/focus-records (집중 기록 조회)
-focusRecordRoutes.get("/:logId", focusController.getRecord);
+// POST /focus/finish (집중 종료)
+focusRoutes.post("/finish", requireLogAuth, focusController.finishFocusSession);
 
-// DELETE /api/focus-records (집중 기록 삭제)
-focusRecordRoutes.delete("/:logId", focusController.deleteRecord);
+// GET /api/focus/me (집중 세션 조회): api 테스트용
+focusRoutes.get("/me", requireLogAuth, focusController.getRecord);
+
+// DELETE /api/focus/me (집중 세션 삭제): api 테스트용
+focusRoutes.delete("/me", requireLogAuth, focusController.deleteRecord);
