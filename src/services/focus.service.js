@@ -2,11 +2,6 @@ import { prisma } from "#db";
 import { HttpException } from "#errors";
 import { formatDateTime } from "#utils";
 
-export const getFocusRecords = async () => {
-  const records = await prisma.focusSession.findMany();
-  return records;
-};
-
 export const createFocusSession = async (logId, targetSeconds) => {
   const result = await prisma.focusSession.upsert({
     where: {

@@ -1,20 +1,20 @@
 import { prisma } from "#db";
+import { ForbiddenException, NotFoundException } from "#errors";
+import { getToday } from "#utils";
 
-//시:분:초 를 버리고 '오늘' 날짜만 만드는 함수 한국시간 기준으로
-const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+const assertHabitOwnership = async (habitId, logId) => {
+  const habit = await prisma.habit.findUnique({ where: { id: habitId } });
 
-const getToday = () => {
-  const kstNow = new Date(new Date().getTime() + KST_OFFSET_MS);
-  return new Date(
-    Date.UTC(
-      kstNow.getUTCFullYear(),
-      kstNow.getUTCMonth(),
-      kstNow.getUTCDate(),
-    ),
-  );
+  if (!habit) {
+    throw new NotFoundException("존재하지 않는 습관입니다.");
+  }
+
+  if (habit.logId !== logId) {
+    throw new ForbiddenException("해당 습관에 대한 권한이 없습니다.");
+  }
 };
 
-export const getTodayHabits = async (logId, page, limit) => {
+export const getHabits = async (logId, page, limit) => {
   const skip = (page - 1) * limit;
   //다음 페이지 여부확인을 위한 7번쨰 습관 조회
   const take = limit + 1;
@@ -41,7 +41,9 @@ export const getTodayHabits = async (logId, page, limit) => {
 };
 
 //습관 이력 생성
-export const createHabitHistory = async (habitId) => {
+export const createHabitHistory = async (habitId, logId) => {
+  await assertHabitOwnership(habitId, logId);
+
   const created = await prisma.habitHistory.create({
     data: { habitId, recordDate: getToday() },
   });
@@ -49,7 +51,9 @@ export const createHabitHistory = async (habitId) => {
 };
 
 //습관 이력 삭제
-export const deleteHabitHistory = async (habitId) => {
+export const deleteHabitHistory = async (habitId, logId) => {
+  await assertHabitOwnership(habitId, logId);
+
   const deleted = await prisma.habitHistory.delete({
     where: {
       habitId_recordDate: {
