@@ -40,7 +40,7 @@ export const getLogById = async (req, res) => {
 
 // PATCH
 export const updateLog = async (req, res) => {
-  const logId = Number(res.locals.validated.params.logId);
+  const { logId } = req.logAuth;
   const logData = res.locals.validated.body;
   const updatedLog = await logService.updateLog(logId, logData);
 
@@ -53,7 +53,7 @@ export const updateLog = async (req, res) => {
 };
 
 export const deleteLog = async (req, res) => {
-  const { logId } = res.locals.validated.params;
+  const { logId } = req.logAuth;
 
   // 삭제(서비스 호출)
   const log = await logService.getLogById(logId);
