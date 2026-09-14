@@ -2,7 +2,7 @@ import express from "express";
 import { z } from "zod";
 
 import * as logController from "#controllers/logs.controller.js";
-import { validate } from "#middlewares";
+import { requireLogAuth, validate } from "#middlewares";
 
 export const logRoutes = express.Router();
 
@@ -159,15 +159,21 @@ logRoutes.post("/", validate(createLogSchema), logController.createLog);
 
 // PATCH /api/logs/:logId (로그 수정)
 logRoutes.patch(
-  "/:logId",
-  validate(logIdSchema, "params"),
+  "/",
+  requireLogAuth,
+  // validate(logIdSchema, "params"),
+  // requireLogAuth로 logId를 가져오기 때문에 받아오지도 않고 검증하지도 않는 것으로 변경하였습니다!
+  // (토큰으로 검증함)
   validate(updateLogSchema, "body"),
   logController.updateLog,
 );
 
 // DELETE /api/logs/:logId (로그 삭제)
 logRoutes.delete(
-  "/:logId",
-  validate(logIdSchema, "params"),
+  "/",
+  requireLogAuth,
+  // validate(logIdSchema, "params"),
+  // requireLogAuth로 logId를 가져오기 때문에 받아오지도 않고 검증하지도 않는 것으로 변경하였습니다!
+  // (토큰으로 검증함)
   logController.deleteLog,
 );
