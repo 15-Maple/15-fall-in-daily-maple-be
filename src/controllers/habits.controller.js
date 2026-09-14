@@ -42,7 +42,7 @@ export const deleteHabitHistory = async (req, res) => {
 };
 
 export const getHabitsWeekly = async (req, res) => {
-  const { logId } = req.logAuth;
+  const { logId } = res.locals.validated.params; // 토큰이 아니라 다시 URL 파라미터에서
 
   const { weekStart, weekEnd, habits } =
     await habitService.getHabitsWeekly(logId);
@@ -51,5 +51,22 @@ export const getHabitsWeekly = async (req, res) => {
     success: true,
     message: "습관기록표 조회 성공",
     data: { weekStart, weekEnd, habits },
+  });
+};
+
+export const syncHabits = async (req, res) => {
+  const { logId } = req.logAuth;
+  const { create, update, delete: deleteIds } = res.locals.validated.body;
+
+  await habitService.syncHabits(logId, {
+    create,
+    update,
+    deleteIds,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "오늘의 습관목록 수정 성공",
+    data: null,
   });
 };
