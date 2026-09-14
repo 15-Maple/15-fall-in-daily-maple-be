@@ -77,8 +77,16 @@ export const updateLogSchema = z
     background: z
       .enum(ALLOWED_BACKGROUNDS, { error: "허용되지 않은 배경입니다." })
       .default("bgGreen"),
-    password: z.string().optional(),
-    passwordConfirm: z.string().optional(),
+    password: z
+      .string()
+      .min(4, "비밀번호는 4글자 이상이어야 합니다.")
+      .max(15, "비밀번호는 15글자 이하여야 합니다.")
+      .optional(),
+    passwordConfirm: z
+      .string()
+      .min(4, "비밀번호는 4글자 이상이어야 합니다.")
+      .max(15, "비밀번호는 15글자 이하여야 합니다.")
+      .optional(),
   })
   .superRefine((data, ctx) => {
     const password = data.password?.trim() || "";
