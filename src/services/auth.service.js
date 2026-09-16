@@ -21,11 +21,9 @@ export const verifyAndGenerateToken = async (logId, password) => {
   }
 
   // 비밀번호가 맞으면 JWT 발급
-  const token = jwt.sign(
-    { logId: log.id },
-    process.env.JWT_SECRET || "maple-secret-key", // 임시 키를 상수처리 해둔것으로 반드시 env파일에 JWT_SECRET 값을 추가해 주세요.(실제 값은 다릅니다.)
-    { expiresIn: "3h" },
-  );
+  const token = jwt.sign({ logId: log.id }, process.env.JWT_SECRET, {
+    expiresIn: "3h",
+  });
 
   return token;
 };
